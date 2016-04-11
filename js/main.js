@@ -16,21 +16,21 @@ function main() {
 
       // Object-specific assets
       //CardBack.preload(game);
-      game.load.image('cardback', '/assets/cardback.png');
-      game.load.image('clear', '/assets/clear.png');
-      game.load.image('deckempty', '/assets/deckempty.png');
-      game.load.image('healthindicator', '/assets/healthindicator.png');
+      game.load.image('cardback', 'assets/cardback.png');
+      game.load.image('clear', 'assets/clear.png');
+      game.load.image('deckempty', 'assets/deckempty.png');
+      game.load.image('healthindicator', 'assets/healthindicator.png');
 
       for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 13; j++) {
-          game.load.image('card' + i + '-' + j, '/assets/card' + i + '-' + j + '.png');
+          game.load.image('card' + i + '-' + j, 'assets/card' + i + '-' + j + '.png');
           break; //debugging purposes, we only need to load the first four images.
         }        
       }
 
       // Other assets
-      game.load.image('bkg', '/assets/gameboard.png');
-      game.load.image('intro', '/assets/intro.png');
+      game.load.image('bkg', 'assets/gameboard.png');
+      game.load.image('intro', 'assets/intro.png');
       //game.load.audio('drums', '/ogg/drums.ogg');      
     },
 
