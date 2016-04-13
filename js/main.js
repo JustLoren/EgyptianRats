@@ -23,8 +23,11 @@ function main() {
 
       for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 13; j++) {
+          if (j > 3)
+            break; //debugging purposes, we only need to load the images we have made.
+
           game.load.image('card' + i + '-' + j, 'assets/card' + i + '-' + j + '.png');
-          break; //debugging purposes, we only need to load the first four images.
+          
         }        
       }
 

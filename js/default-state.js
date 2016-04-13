@@ -49,7 +49,39 @@ DefaultState.prototype.create = function create() {
   var deck = this.createDeck();
   this.teams[0].stack.addCards(deck.splice(0, deck.length / 2));
   this.teams[1].stack.addCards(deck);
+
+  //red play area: x: 2, y: 207, width: 1080, height 726
+
+  //blue play area: x: 2, y: 986, width: 1076, height: 726
+
+  this.game.input.onDown.add(function (pointer) {
+    var canGrab = this.playArea.canGrab();
+    if (pointer.y > 207 && pointer.y < 933) {
+      if (canGrab) {
+        this.teams[0].stack.addCards(this.playArea.clearStack());        
+      } else {
+        this.playArea.pushCards(this.teams[0].stack.discardCards(2));
+      }
+      this.updateHealthIndicator(0);
+    } else if (pointer.y > 986 && pointer.y < 1712) {
+      if (canGrab) {
+        this.teams[1].stack.addCards(this.playArea.clearStack());        
+      } else {
+        this.playArea.pushCards(this.teams[1].stack.discardCards(2));
+      }
+      this.updateHealthIndicator(1);
+    }
+  }, this);
 };
+
+DefaultState.prototype.updateHealthIndicator = function updateHealthIndicator(team) {
+  var remaining = this.teams[team].stack.getCardCount();
+  if (remaining == 0) {
+    this.teams[team].cardBack.kill();
+  }
+  var percentage = remaining / 52;
+  this.teams[team].healthIndicator.updatePosition(percentage);
+}
 
 DefaultState.prototype.update = function update() {
   Phaser.State.prototype.update.call(this);
@@ -60,12 +92,7 @@ DefaultState.prototype.update = function update() {
 
 DefaultState.prototype.cardDrop = function cardDrop(team) {  
   this.playArea.addCards(this.teams[team].stack.removeCard());
-  var remaining = this.teams[team].stack.getCardCount();
-  if (remaining == 0) {
-    this.teams[team].cardBack.kill();
-  }
-  var percentage = remaining / 52;
-  this.teams[team].healthIndicator.updatePosition(percentage);
+  this.updateHealthIndicator(team);
 };
 
 var DRAW_DEBUG_BOXES = false;
@@ -96,7 +123,8 @@ DefaultState.prototype.createDeck = function createDeck() {
       deck.push({
         color: i,
         number: j,
-        key: 'card' + i + '-0', //TODO: change this from -0 to -j
+        key: 'card' + i + '-' + (j > 3 ? 3 : j), //TODO: change this from -0 to -j
+        orientation: 1,
       });
     }
   }
