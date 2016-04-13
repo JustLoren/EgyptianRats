@@ -42,7 +42,7 @@ CardStack.prototype.addCards = function addCards(cards) {
 };
 
 CardStack.prototype.pushCards = function pushCards(cards) {
-  if (cards) {
+  if (cards && cards.length > 0) {
     cards.forEach(function (card) {
       if (this.team == 0)
         card.orientation = -1;
@@ -74,11 +74,9 @@ CardStack.prototype.discardCards = function discardCards(count) {
     return undefined;
   }
   var returnCards;
-  if (this.cards.length >= count) {
-    returnCards = this.cards.splice(-count, count);
-  } else {
-    returnCards = undefined;
-  }
+  
+  returnCards = this.cards.splice(-count, count);
+  
   this.updateGraphic();
 
   return returnCards;
