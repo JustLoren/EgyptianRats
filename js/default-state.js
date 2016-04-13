@@ -11,6 +11,8 @@ DefaultState.prototype.constructor = DefaultState;
 DefaultState.prototype.create = function create() {
   Phaser.State.prototype.create.call(this);
 
+  this.currentTurn = Math.floor(Math.random() * 2);
+
   this.bkg = this.game.add.image(0, 0, 'bkg');
 
   this.playArea = new CardStack(-1, this.game, GAME_W / 2, GAME_H / 2);
@@ -19,12 +21,14 @@ DefaultState.prototype.create = function create() {
   this.teams = [];
   
   this.teams.push({
+    number: 0,
     stack: new CardStack(0, this.game, 60, 120),
     cardBack: new CardBack(0, this.game, this, 60, 120),
     healthIndicator: new HealthIndicator(0, this.game, 525, 109, 'healthindicator'),
   });
 
   this.teams.push({
+    number: 1,
     stack: new CardStack(1, this.game, 1000, 1800),
     cardBack: new CardBack(1, this.game, this, 1000, 1800),
     healthIndicator: new HealthIndicator(1, this.game, 525, 1803, 'healthindicator'),
@@ -72,6 +76,10 @@ DefaultState.prototype.create = function create() {
       this.updateHealthIndicator(1);
     }
   }, this);
+
+  this.teams.forEach(function (team) {
+    team.cardBack.visible = this.currentTurn == team.number;
+  }, this);
 };
 
 DefaultState.prototype.updateHealthIndicator = function updateHealthIndicator(team) {
@@ -86,13 +94,19 @@ DefaultState.prototype.updateHealthIndicator = function updateHealthIndicator(te
 DefaultState.prototype.update = function update() {
   Phaser.State.prototype.update.call(this);
 
-  var _this = this;
+  var _this = this;  
   
 };
 
 DefaultState.prototype.cardDrop = function cardDrop(team) {  
   this.playArea.addCards(this.teams[team].stack.removeCard());
   this.updateHealthIndicator(team);
+
+  this.currentTurn = (this.currentTurn + 1) % this.teams.length;
+
+  this.teams.forEach(function (team) {
+    team.cardBack.visible = this.currentTurn == team.number;
+  }, this);
 };
 
 var DRAW_DEBUG_BOXES = false;
