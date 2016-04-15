@@ -103,10 +103,8 @@ DefaultState.prototype.create = function create() {
       this.updateHealthIndicator(1);
     }
   }, this);
-
-  this.teams.forEach(function (team) {
-    team.cardBack.visible = this.currentTurn == team.number;
-  }, this);
+  
+  this.updateTurnDisplay();
 };
 
 DefaultState.prototype.triggerTap = function triggerTap(team, isValidTap) {
@@ -154,15 +152,19 @@ DefaultState.prototype.cardDrop = function cardDrop(team) {
     this.updateHealthIndicator(team);
 
     this.currentTurn = (this.currentTurn + 1) % this.teams.length;
-
-    this.teams.forEach(function (team) {
-      
-      team.cardBack.visible = team.stack.getCardCount() > 0 && this.currentTurn == team.number;
-      
-    }, this);
+    this.updateTurnDisplay();
   } else {
     alert('somehow, you could drag a card despite having no cards in your deck');
   }
+};
+
+DefaultState.prototype.updateTurnDisplay = function updateTurnDisplay() {
+
+  this.teams.forEach(function (team) {
+
+    team.cardBack.visible = team.stack.getCardCount() > 0 && this.currentTurn == team.number;
+    team.healthIndicator.toggleState(team.cardBack.visible);
+  }, this);
 };
 
 var DRAW_DEBUG_BOXES = false;

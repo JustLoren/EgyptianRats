@@ -32,3 +32,10 @@ HealthIndicator.prototype.constructor = HealthIndicator;
 HealthIndicator.prototype.update = function update() {
   BaseSprite.prototype.update.call(this);
 };
+
+HealthIndicator.prototype.toggleState = function toggleState(state) {
+  if (state)
+    this.loadTexture('healthindicator');
+  else
+    this.loadTexture('healthindicator-flat');
+};
