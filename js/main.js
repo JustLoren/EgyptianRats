@@ -23,7 +23,7 @@ function main() {
 
       for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 13; j++) {
-          if (j > 3)
+          if (j > 4)
             break; //debugging purposes, we only need to load the images we have made.
 
           game.load.image('card' + i + '-' + j, 'assets/card' + i + '-' + j + '.png');
@@ -34,6 +34,8 @@ function main() {
       // Other assets
       game.load.image('bkg', 'assets/gameboard.png');
       game.load.image('intro', 'assets/intro.png');
+      game.load.image('valid-tap', 'assets/valid-tap.png');
+      game.load.image('invalid-tap', 'assets/invalid-tap.png');
       //game.load.audio('drums', '/ogg/drums.ogg');      
     },
 

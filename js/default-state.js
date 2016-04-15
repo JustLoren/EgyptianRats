@@ -11,7 +11,9 @@ DefaultState.prototype.constructor = DefaultState;
 DefaultState.prototype.create = function create() {
   Phaser.State.prototype.create.call(this);
 
-  this.currentTurn = Math.floor(Math.random() * 2);
+  this.tappable = true;
+  this.responseEvent;
+  this.currentTurn = Math.floor(Math.random() * 2);  
 
   this.bkg = this.game.add.image(0, 0, 'bkg');
 
@@ -25,6 +27,8 @@ DefaultState.prototype.create = function create() {
     stack: new CardStack(0, this.game, 60, 120),
     cardBack: new CardBack(0, this.game, this, 60, 120),
     healthIndicator: new HealthIndicator(0, this.game, 525, 109, 'healthindicator'),
+    invalidResponse: new Phaser.Sprite(this.game, 540, 558, 'invalid-tap'),
+    validResponse: new Phaser.Sprite(this.game, 540, 558, 'valid-tap'),    
   });
 
   this.teams.push({
@@ -32,6 +36,9 @@ DefaultState.prototype.create = function create() {
     stack: new CardStack(1, this.game, 1000, 1800),
     cardBack: new CardBack(1, this.game, this, 1000, 1800),
     healthIndicator: new HealthIndicator(1, this.game, 525, 1803, 'healthindicator'),
+    //540 x 1356
+    invalidResponse: new Phaser.Sprite(this.game, 540, 1356, 'invalid-tap'),
+    validResponse: new Phaser.Sprite(this.game, 540, 1356, 'valid-tap'),
   });
 
   for (var idx in this.teams) {
@@ -46,7 +53,20 @@ DefaultState.prototype.create = function create() {
       this.game.add.existing(this.teams[idx].healthIndicator);
 
       this.game.add.existing(this.teams[idx].cardBack);
+
+      if (idx == 0) {
+        this.teams[idx].invalidResponse.scale.setTo(-1, -1);
+        this.teams[idx].validResponse.scale.setTo(-1, -1);
+      }
+
+      this.teams[idx].invalidResponse.anchor.setTo(.5, .5);
+      this.teams[idx].validResponse.anchor.setTo(.5, .5);
       
+      this.game.add.existing(this.teams[idx].invalidResponse);
+      this.game.add.existing(this.teams[idx].validResponse);
+
+      this.teams[idx].invalidResponse.visible = false;
+      this.teams[idx].validResponse.visible = false;
     }
   }
     
@@ -59,19 +79,26 @@ DefaultState.prototype.create = function create() {
   //blue play area: x: 2, y: 986, width: 1076, height: 726
 
   this.game.input.onDown.add(function (pointer) {
+    if (!this.tappable)
+      return;
+
     var canGrab = this.playArea.canGrab();
     if (pointer.y > 207 && pointer.y < 933) {
       if (canGrab) {
-        this.teams[0].stack.addCards(this.playArea.clearStack());        
+        this.teams[0].stack.addCards(this.playArea.clearStack());
+        this.triggerTap(0, true);
       } else {
         this.playArea.pushCards(this.teams[0].stack.discardCards(2));
+        this.triggerTap(0, false);
       }
       this.updateHealthIndicator(0);
     } else if (pointer.y > 986 && pointer.y < 1712) {
       if (canGrab) {
-        this.teams[1].stack.addCards(this.playArea.clearStack());        
+        this.teams[1].stack.addCards(this.playArea.clearStack());
+        this.triggerTap(1, true);
       } else {
         this.playArea.pushCards(this.teams[1].stack.discardCards(2));
+        this.triggerTap(1, false);
       }
       this.updateHealthIndicator(1);
     }
@@ -80,6 +107,27 @@ DefaultState.prototype.create = function create() {
   this.teams.forEach(function (team) {
     team.cardBack.visible = this.currentTurn == team.number;
   }, this);
+};
+
+DefaultState.prototype.triggerTap = function triggerTap(team, isValidTap) {
+  var responseSprite;
+  if (isValidTap)
+    responseSprite = this.teams[team].validResponse;
+  else
+    responseSprite = this.teams[team].invalidResponse;
+
+  responseSprite.visible = true;
+  this.tappable = false;
+
+  this.responseEvent = game.time.events.add(Phaser.Timer.SECOND * 2, this.endTapResponse, this);
+};
+
+DefaultState.prototype.endTapResponse = function endTapResponse() {  
+    this.tappable = true;
+    this.teams.forEach(function (team) {
+      team.invalidResponse.visible = false;
+      team.validResponse.visible = false;
+    }, this);
 };
 
 DefaultState.prototype.updateHealthIndicator = function updateHealthIndicator(team) {
@@ -98,15 +146,23 @@ DefaultState.prototype.update = function update() {
   
 };
 
-DefaultState.prototype.cardDrop = function cardDrop(team) {  
-  this.playArea.addCards(this.teams[team].stack.removeCard());
-  this.updateHealthIndicator(team);
+DefaultState.prototype.cardDrop = function cardDrop(team) {
+  if (this.teams[team].stack.getCardCount() > 0) {
+    this.endTapResponse();
+    game.time.events.remove(this.responseEvent);
+    this.playArea.addCards(this.teams[team].stack.removeCard());
+    this.updateHealthIndicator(team);
 
-  this.currentTurn = (this.currentTurn + 1) % this.teams.length;
+    this.currentTurn = (this.currentTurn + 1) % this.teams.length;
 
-  this.teams.forEach(function (team) {
-    team.cardBack.visible = this.currentTurn == team.number;
-  }, this);
+    this.teams.forEach(function (team) {
+      
+      team.cardBack.visible = team.stack.getCardCount() > 0 && this.currentTurn == team.number;
+      
+    }, this);
+  } else {
+    alert('somehow, you could drag a card despite having no cards in your deck');
+  }
 };
 
 var DRAW_DEBUG_BOXES = false;
@@ -137,7 +193,7 @@ DefaultState.prototype.createDeck = function createDeck() {
       deck.push({
         color: i,
         number: j,
-        key: 'card' + i + '-' + (j > 3 ? 3 : j), //TODO: change this from -0 to -j
+        key: 'card' + i + '-' + (j > 4 ? 4 : j), //TODO: change this from -0 to -j
         orientation: 1,
       });
     }

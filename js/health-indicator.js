@@ -7,6 +7,7 @@ var HealthIndicator = function HealthIndicator(team, game, x, y) {
   this.anchor.setTo(.5, .5);
 
   if (team == 0) {
+    this.scale.setTo(-1, -1);
     this.updatePosition = function(percentage) {
       this.x = 899 - ((899 - 206) * percentage);      
     }
