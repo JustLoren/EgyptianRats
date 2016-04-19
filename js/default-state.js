@@ -195,7 +195,7 @@ DefaultState.prototype.createDeck = function createDeck() {
       deck.push({
         color: i,
         number: j,
-        key: 'card' + i + '-' + (j > 4 ? 4 : j), //TODO: change this from -0 to -j
+        key: 'card' + i + '-' + (j > 7 ? 7 : j), //TODO: change this from -0 to -j
         orientation: 1,
       });
     }
