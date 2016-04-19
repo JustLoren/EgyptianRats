@@ -21,6 +21,8 @@ function main() {
       game.load.image('deckempty', 'assets/deckempty.png');
       game.load.image('healthindicator', 'assets/healthindicator.png');
       game.load.image('healthindicator-flat', 'assets/healthindicator-flat.png');
+      game.load.image('card-play-empty', 'assets/card-play-empty.png');
+      game.load.image('card-play-filled', 'assets/card-play-filled.png');
 
       for (var i = 0; i < 4; i++) {
         for (var j = 0; j < 13; j++) {

@@ -13,10 +13,11 @@ DefaultState.prototype.create = function create() {
 
   this.tappable = true;
   this.responseEvent;
-  this.currentTurn = Math.floor(Math.random() * 2);  
+  this.currentTurn = Math.floor(Math.random() * 2);
+  this.cardsToDeal = 1;
 
   this.bkg = this.game.add.image(0, 0, 'bkg');
-
+  
   this.playArea = new CardStack(-1, this.game, GAME_W / 2, GAME_H / 2);
   this.game.add.existing(this.playArea);
   
@@ -28,7 +29,8 @@ DefaultState.prototype.create = function create() {
     cardBack: new CardBack(0, this.game, this, 60, 120),
     healthIndicator: new HealthIndicator(0, this.game, 525, 109, 'healthindicator'),
     invalidResponse: new Phaser.Sprite(this.game, 540, 558, 'invalid-tap'),
-    validResponse: new Phaser.Sprite(this.game, 540, 558, 'valid-tap'),    
+    validResponse: new Phaser.Sprite(this.game, 540, 558, 'valid-tap'),
+    turnIndicator: new Phaser.Group(this.game),
   });
 
   this.teams.push({
@@ -39,34 +41,58 @@ DefaultState.prototype.create = function create() {
     //540 x 1356
     invalidResponse: new Phaser.Sprite(this.game, 540, 1356, 'invalid-tap'),
     validResponse: new Phaser.Sprite(this.game, 540, 1356, 'valid-tap'),
+    turnIndicator: new Phaser.Group(this.game),
   });
 
   for (var idx in this.teams) {
-    if (this.teams[idx].stack) {
+    var team = this.teams[idx];
+    if (team.stack) {
       
-      this.game.add.existing(this.teams[idx].stack);
+      this.game.add.existing(team.turnIndicator);
+            
 
-      this.teams[idx].healthIndicator.anchor.setTo(.5, .5);
+      team.turnIndicator.x = 250;
 
-      this.teams[idx].healthIndicator.updatePosition(.5);
+      if (team.number == 0) {
+        for (var i = 5; i > 0; i--) {
+          team.turnIndicator.create(125 * i, 0, 'card-play-empty');
+        }
 
-      this.game.add.existing(this.teams[idx].healthIndicator);
+        team.turnIndicator.x = 125;
+        team.turnIndicator.y = 215;
+        
+      } else if (team.number == 1) {
+        for (var i = 0; i < 5; i++) {
+          team.turnIndicator.create(125 * i, 0, 'card-play-empty');
+        }
 
-      this.game.add.existing(this.teams[idx].cardBack);
-
-      if (idx == 0) {
-        this.teams[idx].invalidResponse.scale.setTo(-1, -1);
-        this.teams[idx].validResponse.scale.setTo(-1, -1);
+        team.turnIndicator.x = 250;
+        team.turnIndicator.y = 1600;
       }
 
-      this.teams[idx].invalidResponse.anchor.setTo(.5, .5);
-      this.teams[idx].validResponse.anchor.setTo(.5, .5);
-      
-      this.game.add.existing(this.teams[idx].invalidResponse);
-      this.game.add.existing(this.teams[idx].validResponse);
+      this.game.add.existing(team.stack);
 
-      this.teams[idx].invalidResponse.visible = false;
-      this.teams[idx].validResponse.visible = false;
+      team.healthIndicator.anchor.setTo(.5, .5);
+
+      team.healthIndicator.updatePosition(.5);
+
+      this.game.add.existing(team.healthIndicator);
+
+      this.game.add.existing(team.cardBack);
+
+      if (idx == 0) {
+        team.invalidResponse.scale.setTo(-1, -1);
+        team.validResponse.scale.setTo(-1, -1);
+      }
+
+      team.invalidResponse.anchor.setTo(.5, .5);
+      team.validResponse.anchor.setTo(.5, .5);
+      
+      this.game.add.existing(team.invalidResponse);
+      this.game.add.existing(team.validResponse);
+
+      team.invalidResponse.visible = false;
+      team.validResponse.visible = false;
     }
   }
     
@@ -148,11 +174,20 @@ DefaultState.prototype.cardDrop = function cardDrop(team) {
   if (this.teams[team].stack.getCardCount() > 0) {
     this.endTapResponse();
     game.time.events.remove(this.responseEvent);
-    this.playArea.addCards(this.teams[team].stack.removeCard());
-    this.updateHealthIndicator(team);
+    var playCards = this.teams[team].stack.removeCard();    
+    
+    if (playCards && playCards.length > 0) {
+      var playCard = playCards[0];
+      this.playArea.addCards(playCards);
+      this.updateHealthIndicator(team);
 
-    this.currentTurn = (this.currentTurn + 1) % this.teams.length;
-    this.updateTurnDisplay();
+      if (--this.cardsToDeal == 0 || playCard.interrupt) {
+        this.currentTurn = (this.currentTurn + 1) % this.teams.length;
+        this.cardsToDeal = playCard.cardsToDeal;
+      }
+
+      this.updateTurnDisplay();
+    }
   } else {
     alert('somehow, you could drag a card despite having no cards in your deck');
   }
@@ -164,6 +199,20 @@ DefaultState.prototype.updateTurnDisplay = function updateTurnDisplay() {
 
     team.cardBack.visible = team.stack.getCardCount() > 0 && this.currentTurn == team.number;
     team.healthIndicator.toggleState(team.cardBack.visible);
+
+    for (var i = 0; i < 5; i++) {
+      if (this.currentTurn != team.number) {
+        team.turnIndicator.visible = false;
+      } else {
+        team.turnIndicator.visible = true;
+        if (i + 1 <= this.cardsToDeal) {
+          team.turnIndicator.children[i].loadTexture('card-play-filled');
+        } else {
+          team.turnIndicator.children[i].loadTexture('card-play-empty');
+        }
+      }
+    }
+
   }, this);
 };
 
@@ -197,6 +246,8 @@ DefaultState.prototype.createDeck = function createDeck() {
         number: j,
         key: 'card' + i + '-' + (j > 7 ? 7 : j), //TODO: change this from -0 to -j
         orientation: 1,
+        interrupt: j < 3 ? true : false,
+        cardsToDeal: j < 3 ? j + 3 : 1,
       });
     }
   }
