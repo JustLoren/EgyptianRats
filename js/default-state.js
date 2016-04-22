@@ -149,32 +149,33 @@ DefaultState.prototype.update = function update() {
 
     for (var i = 0; i < this.game.input.pointers.length; i++) {
       var pointer = this.game.input.pointers[i];
-      if (pointer.y > 207 && pointer.y < 933)
-      {
-        if (player1FirstTap) {
-          if (canGrab) {
-            this.teams[0].stack.addCards(this.playArea.clearStack());
-            this.triggerTap(0, true);
+      if (pointer.isDown) {
+        if (pointer.y > 207 && pointer.y < 933) {
+          if (player1FirstTap) {
+            if (canGrab) {
+              this.teams[0].stack.addCards(this.playArea.clearStack());
+              this.triggerTap(0, true);
+            } else {
+              this.playArea.pushCards(this.teams[0].stack.discardCards(2));
+              this.triggerTap(0, false);
+            }
+            this.updateHealthIndicator(0);
           } else {
-            this.playArea.pushCards(this.teams[0].stack.discardCards(2));
-            this.triggerTap(0, false);
+            player1FirstTap = pointer;
           }
-          this.updateHealthIndicator(0);
-        } else {
-          player1FirstTap = pointer;
-        }
-      } else if (pointer.y > 986 && pointer.y < 1712) {
-        if (player2FirstTap) {
-          if (canGrab) {
-            this.teams[1].stack.addCards(this.playArea.clearStack());
-            this.triggerTap(1, true);
+        } else if (pointer.y > 986 && pointer.y < 1712) {
+          if (player2FirstTap) {
+            if (canGrab) {
+              this.teams[1].stack.addCards(this.playArea.clearStack());
+              this.triggerTap(1, true);
+            } else {
+              this.playArea.pushCards(this.teams[1].stack.discardCards(2));
+              this.triggerTap(1, false);
+            }
+            this.updateHealthIndicator(1);
           } else {
-            this.playArea.pushCards(this.teams[1].stack.discardCards(2));
-            this.triggerTap(1, false);
+            player2FirstTap = pointer;
           }
-          this.updateHealthIndicator(1);
-        } else {
-          player2FirstTap = pointer;
         }
       }
     }
