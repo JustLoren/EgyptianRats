@@ -103,32 +103,6 @@ DefaultState.prototype.create = function create() {
   //red play area: x: 2, y: 207, width: 1080, height 726
 
   //blue play area: x: 2, y: 986, width: 1076, height: 726
-
-  this.game.input.onDown.add(function (pointer) {
-    if (!this.tappable)
-      return;
-
-    var canGrab = this.playArea.canGrab();
-    if (pointer.y > 207 && pointer.y < 933) {
-      if (canGrab) {
-        this.teams[0].stack.addCards(this.playArea.clearStack());
-        this.triggerTap(0, true);
-      } else {
-        this.playArea.pushCards(this.teams[0].stack.discardCards(2));
-        this.triggerTap(0, false);
-      }
-      this.updateHealthIndicator(0);
-    } else if (pointer.y > 986 && pointer.y < 1712) {
-      if (canGrab) {
-        this.teams[1].stack.addCards(this.playArea.clearStack());
-        this.triggerTap(1, true);
-      } else {
-        this.playArea.pushCards(this.teams[1].stack.discardCards(2));
-        this.triggerTap(1, false);
-      }
-      this.updateHealthIndicator(1);
-    }
-  }, this);
   
   this.updateTurnDisplay();
 };
@@ -166,7 +140,45 @@ DefaultState.prototype.updateHealthIndicator = function updateHealthIndicator(te
 DefaultState.prototype.update = function update() {
   Phaser.State.prototype.update.call(this);
 
-  var _this = this;  
+  var _this = this;
+
+  if (this.tappable) {
+    var canGrab = this.playArea.canGrab();
+    var player1FirstTap;
+    var player2FirstTap;
+
+    for (var i = 0; i < this.game.input.pointers.length; i++) {
+      var pointer = this.game.input.pointers[i];
+      if (pointer.y > 207 && pointer.y < 933)
+      {
+        if (player1FirstTap) {
+          if (canGrab) {
+            this.teams[0].stack.addCards(this.playArea.clearStack());
+            this.triggerTap(0, true);
+          } else {
+            this.playArea.pushCards(this.teams[0].stack.discardCards(2));
+            this.triggerTap(0, false);
+          }
+          this.updateHealthIndicator(0);
+        } else {
+          player1FirstTap = pointer;
+        }
+      } else if (pointer.y > 986 && pointer.y < 1712) {
+        if (player2FirstTap) {
+          if (canGrab) {
+            this.teams[1].stack.addCards(this.playArea.clearStack());
+            this.triggerTap(1, true);
+          } else {
+            this.playArea.pushCards(this.teams[1].stack.discardCards(2));
+            this.triggerTap(1, false);
+          }
+          this.updateHealthIndicator(1);
+        } else {
+          player2FirstTap = pointer;
+        }
+      }
+    }
+  }
   
 };
 

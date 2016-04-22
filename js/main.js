@@ -46,6 +46,9 @@ function main() {
       game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
       game.antialias = true;
 
+      game.input.addPointer();
+      game.input.addPointer();
+
       game.state.add('intro', new IntroState());
       game.state.add('default', new DefaultState());
       //game.state.add('score', new ScoreState());
