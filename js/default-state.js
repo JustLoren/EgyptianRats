@@ -244,10 +244,10 @@ DefaultState.prototype.createDeck = function createDeck() {
       deck.push({
         color: i,
         number: j,
-        key: 'card' + i + '-' + (j > 7 ? 7 : j), //TODO: change this from -0 to -j
+        key: 'card' + i + '-' + (j > 10 ? 10 : j), //TODO: change this from -0 to -j
         orientation: 1,
-        interrupt: j < 3 ? true : false,
-        cardsToDeal: j < 3 ? j + 3 : 1,
+        interrupt: j < 4 ? true : false,
+        cardsToDeal: j < 4 ? j + 2 : 1,
       });
     }
   }
