@@ -94,9 +94,9 @@ CardStack.prototype.clearStack = function clearStack() {
 CardStack.prototype.updateGraphic = function updateGraphic() {
   if (this.team > -1) {
     if (this.cards.length > 0) {
-      this.loadTexture('cardback');
+      this.loadTexture('clear');
     } else {
-      this.loadTexture('deckempty');
+      this.loadTexture('clear');
     }
   } else {
     if (this.cards.length > 0) {
