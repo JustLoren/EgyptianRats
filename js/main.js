@@ -1,6 +1,7 @@
 ﻿var GAME_W = 1080;
 var GAME_H = 1920;
 var GAME_MAIN_ID = 'main';
+var CARDS_IN_DECK = 60;
 
 /**
  * Global containing the Phaser.Game object

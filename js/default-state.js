@@ -152,7 +152,7 @@ DefaultState.prototype.endTapResponse = function endTapResponse() {
 DefaultState.prototype.updateHealthIndicators = function updateHealthIndicators() {
   var remaining = this.teams[0].stack.getCardCount();
   
-  var percentage = remaining / 52;
+  var percentage = remaining / CARDS_IN_DECK;
   this.bkg.fill(0, 0, 0, 1);
 
   var offset = (GAME_H - 50) * percentage;
@@ -161,7 +161,7 @@ DefaultState.prototype.updateHealthIndicators = function updateHealthIndicators(
 
   var remaining2 = this.teams[1].stack.getCardCount();
 
-  var percentage2 = remaining2 / 52;
+  var percentage2 = remaining2 / CARDS_IN_DECK;
 
   
   var height = (GAME_H - 50) * percentage2;
@@ -282,16 +282,31 @@ DefaultState.prototype.render = function render() {
 
 DefaultState.prototype.createDeck = function createDeck() {
   var deck = [];
+  //for (var i = 0; i < 4; i++) {
+  //  for (var j = 0; j < 13; j++) {      
+  //    deck.push({
+  //      color: i,
+  //      number: j,
+  //      key: 'card' + i + '-' + j,
+  //      orientation: 1,
+  //      interrupt: j < 4 ? true : false,
+  //      cardsToDeal: j < 4 ? 3 : 1,
+  //    });
+  //  }
+  //}
+
   for (var i = 0; i < 4; i++) {
-    for (var j = 0; j < 13; j++) {
-      deck.push({
-        color: i,
-        number: j,
-        key: 'card' + i + '-' + j,
-        orientation: 1,
-        interrupt: j < 4 ? true : false,
-        cardsToDeal: j < 4 ? 3 : 1,
-      });
+    for (var j = 3; j < 8; j++) {
+      for (var k = 0; k < 3; k++) {
+        deck.push({
+          color: i,
+          number: j,
+          key: 'card' + i + '-' + j,
+          orientation: 1,
+          interrupt: j < 4 ? true : false,
+          cardsToDeal: j < 4 ? 3 : 1,
+        });
+      }
     }
   }
 
