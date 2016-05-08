@@ -117,6 +117,7 @@ DefaultState.prototype.create = function create() {
   //blue play area: x: 2, y: 986, width: 1076, height: 726
   
   this.updateTurnDisplay();
+  this.updateHealthIndicators();
 };
 
 DefaultState.prototype.triggerTap = function triggerTap(team) {  
@@ -166,52 +167,13 @@ DefaultState.prototype.updateHealthIndicators = function updateHealthIndicators(
   
   var height = (GAME_H - 50) * percentage2;
   this.bkg.rect(10, GAME_H - 10 - height, GAME_W - 20, height, "#00c9ff");
+
+  this.checkForGameEnd();
 }
 
 DefaultState.prototype.update = function update() {
   Phaser.State.prototype.update.call(this);
-
-  //var _this = this;
-
-  //if (this.tappable) {
-  //  var canGrab = this.playArea.canGrab();
-  //  var player1FirstTap;
-  //  var player2FirstTap;
-
-  //  for (var i = 0; i < this.game.input.pointers.length; i++) {
-  //    var pointer = this.game.input.pointers[i];
-  //    if (pointer.isDown) {
-  //      if (pointer.y > 207 && pointer.y < 933) {
-  //        if (player1FirstTap) {
-  //          if (canGrab) {
-  //            this.teams[0].stack.addCards(this.playArea.clearStack());
-  //            this.triggerTap(0, true);
-  //          } else {
-  //            this.playArea.pushCards(this.teams[0].stack.discardCards(2));
-  //            this.triggerTap(0, false);
-  //          }
-  //          this.updateHealthIndicator(0);
-  //        } else {
-  //          player1FirstTap = pointer;
-  //        }
-  //      } else if (pointer.y > 986 && pointer.y < 1712) {
-  //        if (player2FirstTap) {
-  //          if (canGrab) {
-  //            this.teams[1].stack.addCards(this.playArea.clearStack());
-  //            this.triggerTap(1, true);
-  //          } else {
-  //            this.playArea.pushCards(this.teams[1].stack.discardCards(2));
-  //            this.triggerTap(1, false);
-  //          }
-  //          this.updateHealthIndicator(1);
-  //        } else {
-  //          player2FirstTap = pointer;
-  //        }
-  //      }
-  //    }
-  //  }
-  //}
-  
+   
 };
 
 DefaultState.prototype.cardDrop = function cardDrop(team) {
@@ -225,13 +187,45 @@ DefaultState.prototype.cardDrop = function cardDrop(team) {
       this.playArea.addCards(playCards);
       this.updateHealthIndicators();
 
-      if (--this.cardsToDeal == 0 || playCard.interrupt) {
-        this.currentTurn = (this.currentTurn + 1) % this.teams.length;
-        this.cardsToDeal = playCard.cardsToDeal;
+      if (--this.cardsToDeal == 0 || playCard.interrupt || this.teams[this.currentTurn].stack.getCardCount() == 0) {
+        this.advanceTurn(playCard.cardsToDeal);
       }
 
       this.updateTurnDisplay();
     }
+  }
+};
+
+DefaultState.prototype.advanceTurn = function advanceTurn(cardCount) {
+  
+  for (var i = 0; i < this.teams.length; i++) {
+    this.currentTurn = (this.currentTurn + 1) % this.teams.length;
+    if (this.teams[this.currentTurn].stack.getCardCount() != 0) {
+      this.cardsToDeal = cardCount;
+      return;
+    }
+  }
+
+  //uh oh, couldn't find someone to make the next turn
+  this.currentTurn = -1;
+  this.cardsToDeal = 0;  
+};
+
+DefaultState.prototype.checkForGameEnd = function checkForGameEnd() {
+  var winCondition = -1;  
+
+  for (var i = 0; i < this.teams.length; i++) {
+    if (this.teams[i].stack.getCardCount() == CARDS_IN_DECK)
+    {
+      winCondition = i;
+      break;
+    }
+  }
+
+  if (winCondition > -1) {
+    game.state.start('winner' + winCondition);
+  } else if (this.playArea.getCardCount() == CARDS_IN_DECK && !this.playArea.canGrab()) {
+    game.state.start('draw');
   }
 };
 
@@ -282,29 +276,41 @@ DefaultState.prototype.render = function render() {
 
 DefaultState.prototype.createDeck = function createDeck() {
   var deck = [];
-  //for (var i = 0; i < 4; i++) {
-  //  for (var j = 0; j < 13; j++) {      
-  //    deck.push({
-  //      color: i,
-  //      number: j,
-  //      key: 'card' + i + '-' + j,
-  //      orientation: 1,
-  //      interrupt: j < 4 ? true : false,
-  //      cardsToDeal: j < 4 ? 3 : 1,
-  //    });
-  //  }
-  //}
+
+  var dragons = [0, 1, 2, 3];
+  var others = [4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+  while (dragons.length > 1) {
+    dragons.splice(Math.floor(Math.random() * dragons.length), 1);
+  }
+
+  while (others.length > 4) {
+    others.splice(Math.floor(Math.random() * others.length), 1);
+  }
 
   for (var i = 0; i < 4; i++) {
-    for (var j = 3; j < 8; j++) {
+    for (var k = 0; k < 3; k++) {
+      deck.push({
+        color: i,
+        number: dragons[0],
+        key: 'card' + i + '-' + dragons[0],
+        orientation: 1,
+        interrupt: true,
+        cardsToDeal: 3,
+      });
+    }
+  }
+
+  for (var i = 0; i < 4; i++) {
+    for (var j = 0; j < others.length; j++) {
       for (var k = 0; k < 3; k++) {
         deck.push({
           color: i,
-          number: j,
-          key: 'card' + i + '-' + j,
+          number: others[j],
+          key: 'card' + i + '-' + others[j],
           orientation: 1,
-          interrupt: j < 4 ? true : false,
-          cardsToDeal: j < 4 ? 3 : 1,
+          interrupt: false,
+          cardsToDeal: 1,
         });
       }
     }

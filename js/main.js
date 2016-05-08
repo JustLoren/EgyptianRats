@@ -38,6 +38,10 @@ function main() {
       game.load.image('intro', 'assets/intro.png');
       game.load.image('valid-tap', 'assets/valid-tap.png');
       game.load.image('invalid-tap', 'assets/invalid-tap.png');
+
+      game.load.image('winner0', 'assets/winner0.png');
+      game.load.image('winner1', 'assets/winner1.png');
+      game.load.image('draw', 'assets/draw.png');
       //game.load.audio('drums', '/ogg/drums.ogg');      
     },
 
@@ -50,7 +54,9 @@ function main() {
 
       game.state.add('intro', new IntroState());
       game.state.add('default', new DefaultState());
-      //game.state.add('score', new ScoreState());
+      game.state.add('draw', new EndState(-1));
+      game.state.add('winner0', new EndState(0));
+      game.state.add('winner1', new EndState(1));
 
       game.state.start('intro');
     },
