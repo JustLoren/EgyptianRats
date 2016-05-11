@@ -30,8 +30,8 @@ DefaultState.prototype.create = function create() {
     number: 0,
     stack: new CardStack(0, this.game, 60, 120),
     healthIndicator: new HealthIndicator(0, this.game, 525, 175, 'healthindicator'),
-    invalidResponse: new Phaser.Sprite(this.game, 540, 558, 'invalid-tap'),
-    validResponse: new Phaser.Sprite(this.game, 540, 558, 'valid-tap'),
+    invalidResponse: new Phaser.Sprite(this.game, 540, 770, 'invalid-tap'),
+    validResponse: new Phaser.Sprite(this.game, 540, 770, 'valid-tap'),
     turnIndicator: new Phaser.Group(this.game),
     attackButton: new PressableButton(this.triggerTap, this, 0, this.game, 900, 180, 'attack-0'),
     dealButton: new PressableButton(this.cardDrop, this, 0, this.game, 180, 180, 'deal-0'),
@@ -42,8 +42,8 @@ DefaultState.prototype.create = function create() {
     stack: new CardStack(1, this.game, 1000, 1800),
     healthIndicator: new HealthIndicator(1, this.game, 525, 1750, 'healthindicator'),
     //540 x 1356
-    invalidResponse: new Phaser.Sprite(this.game, 540, 1356, 'invalid-tap'),
-    validResponse: new Phaser.Sprite(this.game, 540, 1356, 'valid-tap'),
+    invalidResponse: new Phaser.Sprite(this.game, 540, 1150, 'invalid-tap'),
+    validResponse: new Phaser.Sprite(this.game, 540, 1150, 'valid-tap'),
     turnIndicator: new Phaser.Group(this.game),
     attackButton: new PressableButton(this.triggerTap, this, 1, this.game, 180, 1750, 'attack-1'),
     dealButton: new PressableButton(this.cardDrop, this, 1, this.game, 900, 1750, 'deal-1'),
@@ -130,7 +130,15 @@ DefaultState.prototype.triggerTap = function triggerTap(team) {
     }
     else {
       responseSprite = this.teams[team].invalidResponse;
-      this.playArea.pushCards(this.teams[team].stack.discardCards(2));
+      if (this.teams[team].stack.getCardCount() > 0) {
+        this.playArea.pushCards(this.teams[team].stack.discardCards(2));
+        if (this.teams[team].stack.getCardCount() == 0 && this.currentTurn == team) {
+          this.advanceTurn(1);
+          this.updateTurnDisplay();
+        }
+      } else if (this.teams.length == 2) {
+        this.teams[(team + 1) % this.teams.length].stack.addCards(this.playArea.clearStack());
+      }
     }
 
     this.updateHealthIndicators();
