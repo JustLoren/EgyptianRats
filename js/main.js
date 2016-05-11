@@ -42,7 +42,7 @@ function main() {
       game.load.image('winner0', 'assets/winner0.png');
       game.load.image('winner1', 'assets/winner1.png');
       game.load.image('draw', 'assets/draw.png');
-      //game.load.audio('drums', '/ogg/drums.ogg');      
+      game.load.audio('attack', ['assets/sounds/attack.ogg', 'assets/sounds/attack.m4a']);      
     },
 
     create: function create() {

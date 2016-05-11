@@ -23,6 +23,8 @@ DefaultState.prototype.create = function create() {
   
   this.playArea = new CardStack(-1, this.game, GAME_W / 2, GAME_H / 2);
   this.game.add.existing(this.playArea);
+
+  this.attackSound = this.game.add.audio('attack');
   
   this.teams = [];
   
@@ -122,6 +124,8 @@ DefaultState.prototype.create = function create() {
 
 DefaultState.prototype.triggerTap = function triggerTap(team) {  
   if (this.tappable) {
+    this.attackSound.play();
+
     var responseSprite;
     var isValidTap = this.playArea.canGrab();
     if (isValidTap) {
