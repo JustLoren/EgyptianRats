@@ -119,8 +119,8 @@ CardStack.prototype.canGrab = function canGrab() {
     return true;
 
   //As can sandwiches
-  //else if (thirdToLastCard >= 0 && this.cards[lastCard].number == this.cards[thirdToLastCard].number)
-  //  return true;
+  else if (thirdToLastCard >= 0 && this.cards[lastCard].number == this.cards[thirdToLastCard].number)
+    return true;
 
   //Everything else is bad
   else
