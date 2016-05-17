@@ -25,6 +25,8 @@ DefaultState.prototype.create = function create() {
   this.game.add.existing(this.playArea);
 
   this.attackSound = this.game.add.audio('attack');
+  this.attackFailedSound = this.game.add.audio('attack-failed');
+  this.playCardSound = this.game.add.audio('playCard');
   
   this.teams = [];
   
@@ -62,7 +64,8 @@ DefaultState.prototype.create = function create() {
 
       if (team.number == 0) {
         for (var i = 3; i > 0; i--) {
-          team.turnIndicator.create(250 * i, 0, 'card-play-empty');
+          team.turnIndicator.create(250 * i + 100, 100, 'card-play-empty');
+          team.turnIndicator.children[team.turnIndicator.children.length - 1].scale.setTo(-1, -1);
         }
 
         team.turnIndicator.x = 0;
@@ -123,16 +126,17 @@ DefaultState.prototype.create = function create() {
 };
 
 DefaultState.prototype.triggerTap = function triggerTap(team) {  
-  if (this.tappable) {
-    this.attackSound.play();
+  if (this.tappable) {    
 
     var responseSprite;
     var isValidTap = this.playArea.canGrab();
     if (isValidTap) {
       responseSprite = this.teams[team].validResponse;
       this.teams[team].stack.addCards(this.playArea.clearStack());
+      this.attackSound.play();
     }
     else {
+      this.attackFailedSound.play();
       responseSprite = this.teams[team].invalidResponse;
       if (this.teams[team].stack.getCardCount() > 0) {
         this.playArea.pushCards(this.teams[team].stack.discardCards(2));
@@ -194,6 +198,8 @@ DefaultState.prototype.cardDrop = function cardDrop(team) {
     game.time.events.remove(this.responseEvent);
     var playCards = this.teams[team].stack.removeCard();    
     
+    this.playCardSound.play();
+
     if (playCards && playCards.length > 0) {
       var playCard = playCards[0];
       this.playArea.addCards(playCards);
