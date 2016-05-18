@@ -10,19 +10,14 @@ IntroState.prototype.create = function create() {
   Phaser.State.prototype.create.call(this);
 
   this.game.add.image(0, 0, 'intro');
+  var _game = this.game;
+  this.game.add.existing(new PressableButton(function () { _game.state.start('credits'); }, this, 0, this.game, 225, 150, 'credits-btn', 'buttonPress'));
+  this.game.add.existing(new PressableButton(function () { _game.state.start('tutorial'); }, this, 0, this.game, 225, 1715, 'instructions-btn', 'buttonPress'));
+  this.game.add.existing(new PressableButton(function () { _game.state.start('default'); }, this, 0, this.game, 663, 971, 'start-btn', 'buttonPress'));
 
 };
 
 IntroState.prototype.update = function update() {
-    if (this.game.input.activePointer.isDown) {
-      if (this.game.input.activePointer.x > 72 && this.game.input.activePointer.x < 315 &&
-          this.game.input.activePointer.y > 1703 && this.game.input.activePointer.y < 1850) {
-        //72, 1703
-        // 315, 1850
-        this.game.state.start('tutorial');
-      } else if (this.game.input.activePointer.x > 296 && this.game.input.activePointer.x < 1028 &&
-          this.game.input.activePointer.y > 867 && this.game.input.activePointer.y < 1014) {
-        this.game.state.start('default');
-      }
-  }
+
+  
 };

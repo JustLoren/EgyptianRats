@@ -35,7 +35,8 @@ function main() {
 
       // Other assets
       //game.load.image('bkg', 'assets/gameboard.png');
-      game.load.image('intro', 'assets/intro.jpg');
+      game.load.image('intro', 'assets/intro.png');
+      game.load.image('credits', 'assets/credits.png');
       game.load.image('instructions', 'assets/instructions.jpg');
       game.load.image('instructions2', 'assets/instructions_page 2.jpg');
       game.load.image('valid-tap', 'assets/valid-tap.png');
@@ -47,6 +48,7 @@ function main() {
       game.load.audio('attack', ['assets/sounds/attack.ogg', 'assets/sounds/attack.m4a']);
       game.load.audio('attack-failed', ['assets/sounds/attack-failed.ogg']);
       game.load.audio('playCard', ['assets/sounds/playCard.ogg']);
+      game.load.audio('buttonPress', ['assets/sounds/buttonPress.ogg']);
     },
 
     create: function create() {
@@ -58,6 +60,7 @@ function main() {
 
       game.state.add('intro', new IntroState());
       game.state.add('tutorial', new TutorialState());
+      game.state.add('credits', new CreditsState());
       game.state.add('default', new DefaultState());
       game.state.add('draw', new EndState(-1));
       game.state.add('winner0', new EndState(0));

@@ -5,7 +5,7 @@ var EndState = function EndState(victor) {
 
 EndState.prototype = Object.create(Phaser.State);
 
-EndState.prototype.constructor = IntroState;
+EndState.prototype.constructor = EndState;
 
 EndState.prototype.create = function create() {
   Phaser.State.prototype.create.call(this);
@@ -18,6 +18,6 @@ EndState.prototype.create = function create() {
 
 EndState.prototype.update = function update() {
     if (this.game.input.activePointer.isDown) {    
-      this.game.state.start('default');
+      this.game.state.start('intro');
     }
 };
