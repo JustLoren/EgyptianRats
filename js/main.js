@@ -46,7 +46,7 @@ function main() {
       game.load.image('winner1', 'assets/winner1.png');
       game.load.image('draw', 'assets/draw.png');
       game.load.audio('attack', ['assets/sounds/attack.ogg', 'assets/sounds/attack.m4a']);
-      game.load.audio('attack-failed', ['assets/sounds/attack-failed.ogg']);
+      game.load.audio('attack-failed', ['assets/sounds/attack-failed.ogg', 'assets/sounds/attack-failed.m4a']);
       game.load.audio('playCard', ['assets/sounds/playCard.ogg']);
       game.load.audio('buttonPress', ['assets/sounds/buttonPress.ogg']);
     },
